@@ -17,7 +17,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <div id="myTimer" style="margin-left: 15px; font-weight: 550"></div>
+    <div ref="myTimer" style="margin-left: 15px; font-weight: 550"></div>
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
     <div id="main" style="margin-left: 5px"></div>
   </div>
@@ -40,92 +40,88 @@ export default {
     };
   },
   mounted() {
-    this.circleTimer()
+    this.circleTimer();
 
     request.get("/dashboard").then((res) => {
       if (res.code == 0) {
-        // console.log(res.data)
         this.cards[0].data = res.data.lendRecordCount;
         this.cards[1].data = res.data.visitCount;
         this.cards[2].data = res.data.bookCount;
         this.cards[3].data = res.data.userCount;
-        // console.log(echarts);
+
+        this.$nextTick(() => {
+          const dom = document.getElementById("main");
+          if (!dom) {
+            console.error("#main 元素未找到！");
+            return;
+          }
+
+          // 销毁旧实例（防止重复初始化）
+          if (dom._echarts_instance) {
+            echarts.dispose(dom);
+          }
+
+          const myChart = echarts.init(dom);
+          myChart.setOption({
+            title: { text: "统计" },
+            tooltip: { trigger: "axis" },
+            grid: { left: "3%", right: "4%", bottom: "3%", containLabel: true },
+            xAxis: {
+              type: "category",
+              data: this.cards.map((item) => item.title),
+              axisTick: { alignWithLabel: true },
+            },
+            yAxis: { type: "value" },
+            series: [
+              {
+                type: "bar",
+                label: { show: true },
+                barWidth: "25%",
+                data: [
+                  {
+                    value: this.cards[0].data,
+                    itemStyle: { color: "#5470c6" },
+                  },
+                  {
+                    value: this.cards[1].data,
+                    itemStyle: { color: "#91cc75" },
+                  },
+                  {
+                    value: this.cards[2].data,
+                    itemStyle: { color: "#fac858" },
+                  },
+                  {
+                    value: this.cards[3].data,
+                    itemStyle: { color: "#ee6666" },
+                  },
+                ],
+              },
+            ],
+          });
+
+          window.addEventListener("resize", () => {
+            myChart.resize();
+          });
+        });
       } else {
         ElMessage.error(res.msg);
       }
-      // 基于准备好的dom，初始化echarts实例
-      var myChart = echarts.init(document.getElementById("main"));
-      console.log(this.cards[0].data);
-       myChart.setOption({
-        title: {
-          text: '统计'
-        },
-         tooltip: {
-          trigger: 'axis'
-          // axisPointer: {
-          //   type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-          // }
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'category',
-          data: this.cards.map(item => item.title),
-          axisTick: {
-            alignWithLabel: true
-          }
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: [
-          {
-            type: 'bar',
-            label: { show: true },
-            barWidth: '25%',
-            data: [
-              {
-                value: this.cards[0].data,
-                itemStyle: { color: '#5470c6' }
-              },
-              {
-                value: this.cards[1].data,
-                itemStyle: { color: '#91cc75' }
-              },
-              {
-                value: this.cards[2].data,
-                itemStyle: { color: '#fac858' }
-              },
-              {
-                value: this.cards[3].data,
-                itemStyle: { color: '#ee6666' }
-              }
-            ]
-          }
-        ]
-       });
-       window.addEventListener('resize', () => {
-        myChart.resize()
-      })
     });
   },
   methods: {
-    circleTimer() {//实时更新
-      this.getTimer()
-      setInterval(() => {
-        this.getTimer()
-      }, 1000)
+    //方法
+    circleTimer() {
+      // 方法：启动定时器
+      this.getTimer();
+      this.timer = setInterval(this.getTimer, 1000);
     },
     getTimer() {
-      var d = new Date()
-      var t = d.toLocaleString()
-      document.getElementById('myTimer').innerHTML = t//本地化的字符串格式
-    }
-  }
+      // 方法：更新当前时间
+      if (this.$refs.myTimer) {
+        this.$refs.myTimer.innerHTML = new Date().toLocaleString();
+      }
+    },
+  },
 };
 </script>
 
@@ -155,8 +151,8 @@ export default {
 }
 
 .icon {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   padding-top: 5px;
   padding-right: 10px;
 }
