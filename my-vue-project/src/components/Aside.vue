@@ -35,7 +35,7 @@
         <span>修改密码</span>
       </el-menu-item>
     </el-sub-menu>
-    <el-menu-item  v-if="user.role == 1">
+    <el-menu-item  v-if="user.role == 1" index="/book">
       <svg class="icon" aria-hidden="true">
         <use xlink:href="#iconreader "></use>
       </svg>

@@ -23,6 +23,11 @@
           name: "Password",
           component: () => import("@/views/PasswordPage.vue"),
         },
+        {
+          path: "book",
+          name: "book",
+          component: () => import("@/views/BookPage.vue"),
+        },
       ],
     },
     {
