@@ -60,9 +60,7 @@ export default {
             trigger: 'blur',
           }
         ]
-
       }
-
     }
   },
   methods: {
@@ -80,7 +78,6 @@ export default {
             ElMessage.error("验证码错误")
             return
           }
-
           request.post("user/login", this.form).then(res => {
             if (res.code == 0) {
               ElMessage.success("登录成功")
@@ -92,9 +89,7 @@ export default {
           })
         }
       })
-
     },
-
   }
 }
 
