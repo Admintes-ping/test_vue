@@ -93,7 +93,7 @@
     v-model="OnputDialogVisible"
     title="上架书籍"
     width="30%"
-  >
+    >
     <el-form :model="form" label-width="120px">
       <el-form-item label="图书编号">
             <el-input style="width: 80%" v-model="form.isbn"></el-input>
@@ -200,9 +200,26 @@ export default {
     },
     add(){
       this.OnputDialogVisible = true
+      this.form ={}
     },
     save(){
-
+      //ES6语法
+      //地址,但是？IP与端口？+请求参数
+      // this.form?这是自动保存在form中的，虽然显示时没有使用，但是这个对象中是有它的
+      this.form.borrownum = 0
+      this.form.status = 1
+      request.post("/book",this.form).then(res =>{
+        if(res.code == 0){
+            if(res.code == 0){
+              ElMessage.success('上架书籍成功')
+            }
+          }
+          else {
+            ElMessage.error(res.msg)
+          }
+          this.load()
+          this.OnputDialogVisible = false
+      })
     }
   },
 };
